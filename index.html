@@ -82,24 +82,6 @@
   body { animation: pageSettle .4s ease-out; }
   @keyframes pageSettle { from { opacity: 0; } to { opacity: 1; } }
 
-  .sticky-mini {
-    display: none;
-    font-size: 12px;
-    font-weight: bold;
-    color: var(--ice);
-    background: var(--steel-dark);
-    padding: 8px 12px;
-    border-radius: 4px;
-    letter-spacing: .04em;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-  @media (max-width: 640px) {
-    #draft-sticky.stuck .sticky-full { display: none !important; }
-    #draft-sticky.stuck .sticky-mini { display: block; }
-  }
-
   .lobby-panel {
     background: var(--steel-card);
     border: 1px solid rgba(255,255,255,0.08);
@@ -2817,11 +2799,6 @@
     }
     // pro mode: no grade bar shown
 
-    let tc = state.tierCaps;
-    let stickyMiniHtml = dm === 'beer_league'
-      ? `NO CAPS &bull; ${filledCount}/7 SLOTS FILLED`
-      : `⭐${tc.legend.drafted}/${tc.legend.max} &bull; HOF ${tc.hof.drafted}/${tc.hof.max} &bull; AS ${tc.allStar.drafted}/${tc.allStar.max} &bull; CORE ${tc.core.drafted}/${tc.core.max} &nbsp;|&nbsp; ${filledCount}/7 SLOTS`;
-
     let html = `
       <div class="lobby-panel" style="animation: fadeUp 0.35s ease-out; text-align: left; max-width: 1000px;">
         <h2 style="text-align: center; font-family: 'Impact', sans-serif; font-size: 28px; letter-spacing: 0.05em; color: var(--red-lamp);">DRAFT SELECTION BOARD</h2>
@@ -2829,10 +2806,7 @@
           PLAYER POOL OPEN: ${team.era} ${team.name.toUpperCase()}
         </p>
 
-        <div id="sticky-sentinel"></div>
-        <div id="draft-sticky" style="position: sticky; top: 0; z-index: 50; background: var(--steel-card); padding: 10px 0; margin-bottom: 15px; box-shadow: 0 8px 16px -8px rgba(0,0,0,0.6);">
-        <div class="sticky-mini">${stickyMiniHtml}</div>
-        <div class="sticky-full" style="display: flex; gap: 15px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap;">
           <div style="flex: 1; min-width: 280px; background: var(--steel-dark); padding: 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
             <div style="font-size: 11px; text-transform: uppercase; color: #6a8ba5; letter-spacing: 0.1em; margin-bottom: 10px; font-weight: bold;">Consolidated Asset Caps</div>
             <div style="font-size: 13px; line-height: 1.7; color:${dm === 'beer_league' ? '#6a8ba5' : 'var(--ice)'};">
@@ -2854,7 +2828,6 @@
               <div style="grid-column: span 2;">UTIL: <strong style="color: var(--pos-flex);">${state.roster.FLEX ? state.roster.FLEX.name : 'VACANT'}</strong></div>
             </div>
           </div>
-        </div>
         </div>
 
         ${gradeBarHtml}
@@ -2948,15 +2921,6 @@
 
     html += `</div>`;
     document.getElementById('app').innerHTML = html;
-
-    // Toggle compact mode on the sticky info box once it pins to the viewport
-    let sentinel = document.getElementById('sticky-sentinel');
-    if (sentinel && 'IntersectionObserver' in window) {
-      new IntersectionObserver(entries => {
-        let box = document.getElementById('draft-sticky');
-        if (box) box.classList.toggle('stuck', !entries[0].isIntersecting);
-      }).observe(sentinel);
-    }
   }
 
   function stageDraftPick(cardIndex) {
